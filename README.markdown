@@ -16,26 +16,15 @@ Charazard.fix_invalid_unicode_literals("\x93Smart quotes\x94 \xC3\x9Cber Unicode
 
 `Charazard.fix_invalid_unicode_literals` can be used in combination with
 [`filter_io`](https://github.com/jasoncodes/filter_io) to filter CSV streams.
-Here’s an example that handles UTF-8/ISO-8859-1 with mixed line endings:
+Since this is such a common use case, Charazard includes a handy
+[helper class](https://github.com/jasoncodes/charazard/blob/master/lib/charazard/io.rb):
 
 ``` ruby
-require 'filter_io'
-require 'charazard'
+require 'charazard/io'
 require 'csv'
 
 File.open(filename, external_encoding: 'UTF-8') do |io|
-  io = FilterIO.new(io) do |data, state|
-    # fix invalid UTF-8 literals
-    data = Charazard.fix_invalid_unicode_literals(data)
-
-    # grab another chunk if the last character is a delimiter
-    raise FilterIO::NeedMoreData if data =~ /[\r\n]\z/ && !state.eof?
-    # normalise line endings to LF
-    data = data.gsub /\r\n|\r|\n/, "\n"
-
-    data
-  end
-
+  io = Charazard::IO.new(io)
   CSV.parse(io, row_sep: "\n") do |row|
     p row
   end

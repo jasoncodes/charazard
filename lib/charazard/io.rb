@@ -11,7 +11,7 @@ module Charazard
         # grab another chunk if the last character is a delimiter
         raise FilterIO::NeedMoreData if data =~ /[\r\n]\z/ && !state.eof?
         # normalise line endings to LF
-        data = data.gsub /\r\n|\r|\n/, "\n"
+        data = data.gsub(/\r\n|\r|\n/, "\n")
 
         data
       end
